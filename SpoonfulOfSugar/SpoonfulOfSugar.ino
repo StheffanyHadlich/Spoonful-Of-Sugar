@@ -19,8 +19,8 @@
 
 
 // ------------------------------------------ WEB RELATED FUNCTIONS ------------------------------------------------------------
-#define ssid ""
-#define password ""
+#define ssid "Hadllich"
+#define password "36221595"
 WiFiServer server(80);
 strDateTime dateTime;
 NTPtime NTPch("br.pool.ntp.org");
@@ -97,23 +97,26 @@ const int MaxAlarms = 12;
 const int BoxSpots = 6;
 bool Box[BoxSpots] = {false};
 
+class AlarmSchedule{
+  public:
+    int alarmHour;
+    int alarmMinute;  
+};
+
 class Medicine{
   private:
     int _spot;
     String _nameMedicine = "Empty";
     String _amount = "0";
     int _gap = 0;
-    int _alarmHour[MaxAlarms] = {-1};
-    int _alarmMinute = -1;
-    
+    LinkedList<AlarmSchedule> *alarms = new LinkedList<AlarmSchedule>(); 
     
   public:
-   bool InsertMedicine(String nameMedicine,String amount,int gap);
+   bool InsertMedicine(String nameMedicine,String amount,int gap,  LinkedList<AlarmSchedule> schedule);
    int FindPlace();
-   void calculateAlarms(int gap);
    int DefinePort(int spot);
-   int GetHours(int j);
-   int GetMinutes();
+   void AddAlarms(LinkedList<AlarmSchedule> schedule);
+   void GetAllInfo();
 };
 
 Medicine *medicine[BoxSpots];
@@ -128,44 +131,35 @@ void MedicineInitialize(){ //Remember to call this at the setUp
 
 //------------------------------------------------ INSERT MEDICINE 
 
-int Medicine::GetHours(int j)
-{
-  return _alarmHour[j];
-}
-
-int Medicine::GetMinutes()
-{
-  return _alarmMinute;
-}
-
-void Medicine::calculateAlarms(int gap){
-  int x = 24/gap;
-  int i=0, hourX;
-  
-  // First alarm is at the moment
-  _alarmHour[i] = hour();
-  _alarmMinute = minute(); //it actually does not change.
-  
-  for(i=1;i<x;i++){
-    hourX = _alarmHour[i-1]+x;
-
-    if(hourX > 23){
-      hourX = hourX - 24;
-    }
-    _alarmHour[i]= hourX;
+void Medicine::GetAllInfo(){
+  Serial.println("Informacoes sobre Remedio");
+  Serial.println(_spot);
+  Serial.println(_nameMedicine);
+  Serial.println(_amount);
+  Serial.println(_gap);
+  Serial.println("Hora dos alarmes: ");
+  int i;
+  for(i=0;i<_gap;i++){
+    Serial.println((alarms->get(i)).alarmHour);
+    Serial.println((alarms->get(i)).alarmMinute);
   }
-  
 }
 
-bool Medicine::InsertMedicine(String nameMedicine,String amount,int gap){
+
+bool Medicine::InsertMedicine(String nameMedicine,String amount,int gap, LinkedList<AlarmSchedule> schedule){
     int place  = FindPlace();
     if (place != ERRORFULLBOX){
       _nameMedicine = nameMedicine;
       _amount = amount;
       _gap=gap;
-      calculateAlarms(_gap);
-      _spot = DefinePort(place);
-      return true; //Do I really need this?
+      _spot = DefinePort(place);  
+      int i;
+      
+      for(i=0;i<3;i++){   
+         alarms->add(schedule.get(i));   
+      }   
+            
+    return true; //Do I really need this?
     }
     else{
       Serial.println("ERROR: Full box");  
@@ -207,34 +201,6 @@ int Medicine::FindPlace(){
 
 // ----------------------------------- CLASS ALARMS / HOUR 
 
-class AlarmsPerHour{
-  public:
-    Medicine med;
-    int minutes;
-};
-
-LinkedList<AlarmsPerHour> *bob = new LinkedList<AlarmsPerHour>(); 
-
-void AlarmSchedule(){ // Looks for alarms at each hour
-
-  bob->shift();
-  
-  int i,j;
-
-  for(i=0;i<BoxSpots;i++)
-  {
-    for(j=0;j<MaxAlarms;j++){
-      if((medicine[i]->GetHours(j))==hour()){ 
-         AlarmsPerHour *P;
-         P->med = *medicine[i]; 
-         P->minutes= medicine[i]->GetMinutes();
-         bob->add(*P);
-      }
-    }
-  }
-
-}
-
 void Blink()
 {
   digitalWrite(D6, HIGH);
@@ -243,71 +209,39 @@ void Blink()
   digitalWrite(D6, LOW);
 }
 
-void AlarmBob(){
-  int i;
-  for(i=0;i<bob->size();i++){
-    if(((bob->get(i)).minutes) == minute()){
-      Blink();
-    }
-  }
-}
 
 // -------------------------------------------- CLIENTE RELATED FUNCTIONS -----------------------------------------------------
 
-void InternetStuff(){ // Use this as example
-  
-//  // Check if a client has connected
-//  WiFiClient client = server.available();
-//  if (!client) {
-//    return;
-//  }
-// 
-//  // Wait until the client sends some data
-//  Serial.println("new client");
-//  while(!client.available()){
-//    delay(1);
-//  }
-// 
-//  // Read the first line of the request
-//  String request = client.readStringUntil('\r');
-//  Serial.println(request);
-//  client.flush();
-// 
-//  // Match the request
-// 
-//  int value = LOW;
-//  if (request.indexOf("/R") != -1)  {
-//    digitalWrite(ledPin, HIGH);
-//    myStepper.step(stepsPerRevolution);
-//    delay(200);
-//    digitalWrite(ledPin, LOW);
-//
-//  }
-//  if (request.indexOf("/L") != -1)  {
-//  digitalWrite(ledPin, HIGH);
-//
-//    myStepper.step(-stepsPerRevolution);
-//    delay(200);
-//    digitalWrite(ledPin, LOW);
-//
-//   }
-// 
-//  // Return the response
-//  client.println("HTTP/1.1 200 OK");
-//  client.println("Content-Type: text/html");
-//  client.println(""); //  do not forget this one
-//  client.println("<!DOCTYPE HTML>");
-//  client.println("<html>");
-// 
-//  client.println("<br><br>");
-//  client.println("<a href=\"/R\"\"><button>LEFT </button></a>");
-//  client.println("<a href=\"/L\"\"><button>RIGHT </button></a><br />");  
-//  client.println("</html>");
-// 
-//  delay(1);
-}
 
 // ----------------------------------------- I GUESS I CAN CALL IT MAIN RELATED FUNCTIONS -----------------------------------------
+
+
+void Test(){
+
+
+      int i;
+
+       AlarmSchedule *comprimido[3];
+       LinkedList<AlarmSchedule> *schedule = new LinkedList<AlarmSchedule>();
+
+        comprimido[0]=new AlarmSchedule(); 
+        comprimido[1]=new AlarmSchedule(); 
+        comprimido[2]=new AlarmSchedule(); 
+
+      for(i=0;i<3;i++){    
+           
+         comprimido[i]->alarmHour =i+2;
+         comprimido[i]->alarmMinute = i+3;
+         schedule->add(*comprimido[i]);
+      }    
+     
+      
+  
+      medicine[0]->InsertMedicine("Remedio A","1 comprimido",schedule->size(),*schedule);
+      medicine[0]->GetAllInfo();
+     
+  
+}
 
 void setup() {
   Serial.begin(9600);
@@ -317,18 +251,17 @@ void setup() {
   MedicineInitialize();
 }
 
-int RightNow = -1;
+
+int count = 0;
 
 void loop() {
   setCurrentTime();
-  digitalClockDisplay();
+  //digitalClockDisplay();
 
-  if(RightNow != hour()){
-    RightNow = hour();
-    AlarmSchedule();
-  }
-
-  AlarmBob(); // this must be use as the alarm
-  
+   if(count==0){
+    Test();
+    count++;
+   }
+   
   delay(1000);
 }
