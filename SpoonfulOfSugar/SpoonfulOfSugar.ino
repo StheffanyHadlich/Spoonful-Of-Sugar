@@ -19,8 +19,8 @@
 
 
 // ------------------------------------------ WEB RELATED FUNCTIONS ------------------------------------------------------------
-#define ssid "Hadllich"
-#define password "36221595"
+#define ssid ""
+#define password ""
 WiFiServer server(80);
 strDateTime dateTime;
 NTPtime NTPch("br.pool.ntp.org");
@@ -78,7 +78,7 @@ void digitalClockDisplay()
 
 void setCurrentTime()
 {
-   dateTime = NTPch.getNTPtime(21.0, 0); // NTP pool time zone, DST
+   dateTime = NTPch.getNTPtime(21.0, 1); // NTP pool time zone, DST
     if(dateTime.valid){
       byte actualHour = dateTime.hour;
       byte actualMinute = dateTime.minute;
@@ -95,6 +95,7 @@ void setCurrentTime()
 #define ERRORFULLBOX -1
 const int MaxAlarms = 12;
 const int BoxSpots = 6;
+int countMedicine = 0;
 bool Box[BoxSpots] = {false};
 
 class AlarmSchedule{
@@ -117,9 +118,13 @@ class Medicine{
    int DefinePort(int spot);
    void AddAlarms(LinkedList<AlarmSchedule> schedule);
    void GetAllInfo();
+   int GetGap();
+   int GetAlarmsHour(int j);
+   int GetAlarmsMinute(int j);
+   int GetSpot();
 };
 
-Medicine *medicine[BoxSpots];
+Medicine *medicine[BoxSpots]; //List of medicines
 
 void MedicineInitialize(){ //Remember to call this at the setUp
   int i;
@@ -131,6 +136,23 @@ void MedicineInitialize(){ //Remember to call this at the setUp
 
 //------------------------------------------------ INSERT MEDICINE 
 
+ int Medicine::GetGap(){
+  return _gap;
+}
+
+ int Medicine::GetSpot(){
+  return _spot;
+}
+
+int Medicine::GetAlarmsHour(int j){
+  return (alarms->get(j)).alarmHour;
+}
+
+
+int Medicine::GetAlarmsMinute(int j){
+  return (alarms->get(j)).alarmMinute;
+}
+
 void Medicine::GetAllInfo(){
   Serial.println("Informacoes sobre Remedio");
   Serial.println(_spot);
@@ -140,8 +162,9 @@ void Medicine::GetAllInfo(){
   Serial.println("Hora dos alarmes: ");
   int i;
   for(i=0;i<_gap;i++){
-    Serial.println((alarms->get(i)).alarmHour);
-    Serial.println((alarms->get(i)).alarmMinute);
+    Serial.print((alarms->get(i)).alarmHour);
+    printDigits((alarms->get(i)).alarmMinute);
+    Serial.println(); 
   }
 }
 
@@ -158,8 +181,8 @@ bool Medicine::InsertMedicine(String nameMedicine,String amount,int gap, LinkedL
       for(i=0;i<3;i++){   
          alarms->add(schedule.get(i));   
       }   
-            
-    return true; //Do I really need this?
+      countMedicine++;      
+      return true; //Do I really need this?
     }
     else{
       Serial.println("ERROR: Full box");  
@@ -188,6 +211,7 @@ int Medicine::FindPlace(){
       return ERRORFULLBOX;
     }
     else{
+      Box[i]=true;
       return i;
     } 
 }
@@ -199,18 +223,38 @@ int Medicine::FindPlace(){
 //------------------------------------------------------------------- ALARM RELATED FUNCTIONS ----------------------------------------------------------------
 
 
-// ----------------------------------- CLASS ALARMS / HOUR 
+void IsThereAlarm(){ 
+  int i, j;
 
-void Blink()
-{
-  digitalWrite(D6, HIGH);
-  delay(250);
-  Serial.println("Blink");
-  digitalWrite(D6, LOW);
+  for(i=0;i<countMedicine;i++){
+    for(j=0;j<medicine[i]->GetGap();j++){
+
+      if(medicine[i]->GetAlarmsHour(j) == hour()){
+        if(medicine[i]->GetAlarmsMinute(j) == minute()){
+          Serial.println("*************** DEU CERTO *************");
+          Blink(D6);
+          Serial.println(medicine[i]->GetSpot());
+          digitalClockDisplay();          
+          medicine[i]->GetAllInfo();
+        }
+      }             
+    } 
+  }
 }
 
 
-// -------------------------------------------- CLIENTE RELATED FUNCTIONS -----------------------------------------------------
+// ----------------------------------- CLASS ALARMS / HOUR 
+
+void Blink(int led)
+{
+  digitalWrite(led, HIGH);
+  delay(1000);
+  Serial.println("Blink");
+  digitalWrite(led, LOW);
+}
+
+
+// -------------------------------------------- CLIENT RELATED FUNCTIONS ??????-----------------------------------------------------
 
 
 // ----------------------------------------- I GUESS I CAN CALL IT MAIN RELATED FUNCTIONS -----------------------------------------
@@ -221,30 +265,71 @@ void Test(){
 
       int i;
 
-       AlarmSchedule *comprimido[3];
+       AlarmSchedule *comprimido[2];
        LinkedList<AlarmSchedule> *schedule = new LinkedList<AlarmSchedule>();
 
         comprimido[0]=new AlarmSchedule(); 
         comprimido[1]=new AlarmSchedule(); 
-        comprimido[2]=new AlarmSchedule(); 
 
-      for(i=0;i<3;i++){    
-           
-         comprimido[i]->alarmHour =i+2;
-         comprimido[i]->alarmMinute = i+3;
+        comprimido[0]->alarmHour =14;
+        comprimido[0]->alarmMinute = 21;
+        comprimido[1]->alarmHour =14;
+        comprimido[1]->alarmMinute = 23;
+ 
+
+      for(i=0;i<2;i++){               
          schedule->add(*comprimido[i]);
+      }    
+
+      AlarmSchedule *comprimido2[2];
+       LinkedList<AlarmSchedule> *schedule2 = new LinkedList<AlarmSchedule>();
+
+        comprimido2[0]=new AlarmSchedule(); 
+        comprimido2[1]=new AlarmSchedule(); 
+ 
+        comprimido2[0]->alarmHour =14;
+        comprimido2[0]->alarmMinute = 25;
+        comprimido2[1]->alarmHour =14;
+        comprimido2[1]->alarmMinute = 27;
+
+      
+      for(i=0;i<2;i++){               
+         schedule2->add(*comprimido2[i]);
+      }    
+
+      AlarmSchedule *comprimido3[2];
+       LinkedList<AlarmSchedule> *schedule3 = new LinkedList<AlarmSchedule>();
+
+        comprimido3[0]=new AlarmSchedule(); 
+        comprimido3[1]=new AlarmSchedule();
+        
+        comprimido3[0]->alarmHour =14;
+        comprimido3[0]->alarmMinute = 29; 
+        comprimido3[1]->alarmHour = 14;
+        comprimido3[1]->alarmMinute = 31; 
+ 
+
+      for(i=0;i<2;i++){               
+         schedule3->add(*comprimido3[i]);
       }    
      
       
   
       medicine[0]->InsertMedicine("Remedio A","1 comprimido",schedule->size(),*schedule);
-      medicine[0]->GetAllInfo();
+      medicine[1]->InsertMedicine("Remedio B","2 comprimido",schedule2->size(),*schedule2);
+      medicine[2]->InsertMedicine("Remedio C","3 comprimido",schedule3->size(),*schedule3);
      
   
 }
 
 void setup() {
   Serial.begin(9600);
+  pinMode(D0, OUTPUT);
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D3, OUTPUT);
+  pinMode(D4, OUTPUT);
+  pinMode(D5, OUTPUT);
   pinMode(D6, OUTPUT);
   WifiConnection();
   startServer();
@@ -262,6 +347,8 @@ void loop() {
     Test();
     count++;
    }
-   
+ 
+  IsThereAlarm();
+  digitalClockDisplay();  
   delay(1000);
 }
