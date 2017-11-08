@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <Stepper.h>
  
-const char* ssid = "NDakota";
-const char* password = "stheffany";
+const char* ssid = "Hadllich";
+const char* password = "36221595";
 const int stepsPerRevolution = 200;
 Stepper myStepper(stepsPerRevolution, D1, D2, D5, D6);
 
@@ -10,13 +10,7 @@ int ledPin = D4; // GPIO13
 WiFiServer server(80);
  
 void setup() {
-    myStepper.setSpeed(60);
-  Serial.begin(9600);
-  delay(10);
- 
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
- 
+    
   // Connect to WiFi network
   Serial.println();
   Serial.println();
@@ -63,22 +57,40 @@ void InternetStuff(){
   client.flush();
  
   // Match the request
- 
-  int value = LOW;
-  if (request.indexOf("/R") != -1)  {
-    digitalWrite(ledPin, HIGH);
-    myStepper.step(stepsPerRevolution);
-    delay(200);
-    digitalWrite(ledPin, LOW);
 
-  }
-  if (request.indexOf("/L") != -1)  {
-  digitalWrite(ledPin, HIGH);
+  int initTag, endTag;
+  String nameMedicine;
+  String amount;
+  int gap;
+  int hourTag;
+  int minuteTag;
 
-    myStepper.step(-stepsPerRevolution);
-    delay(200);
-    digitalWrite(ledPin, LOW);
+  initTag = request.indexOf("=");
+  endTag = request.indexOf("&");
+  nameMedicine = request.substring(initTag+1,endTag-1);
 
+//  initTag = request.indexOf(initTag,"=");
+//  endtTag = request.indexOf("&");
+//  amount = request.substring(initTag+1,endTag-1);
+//
+//  initTag = request.indexOf(initTag,"=");
+//  endtTag = request.indexOf("&");
+//  //gap = int(request.substring(initTag+1,endTag-1));
+//
+//  initTag = request.indexOf(initTag,"=");
+//  endtTag = request.indexOf("&");
+//  //hourTag = int(request.substring(initTag+1,endTag-1));
+//
+//  initTag = request.indexOf(initTag,"=");
+//  //minuteTag = int(request.substring(initTag+1));
+
+  Serial.println(nameMedicine);
+ // Serial.println(amount);
+  //Serial.println(gap);
+  //Serial.println(hourTag);
+  //Serial.println(medicineTag);
+
+  
    }
  
   // Return the response
@@ -98,13 +110,13 @@ client.println("<body>");
     client.println("<input type='text'  name='medicine'/></br>");
 
     client.println("<br> Quantidade:");
-    client.println("<input type='text'  name='medicine'/></br>");
+    client.println("<input type='text'  name='amount'/></br>");
 
     client.println("<br> Adicionar Alarmes:");
     client.println("<br> Hora:");
     client.println("<input type='number' name='hour'/></br>");
     client.println("<br> Minuto:");
-    client.println("<input type='number' name='hour'/></br>");
+    client.println("<input type='number' name='minute'/></br>");
 
 
     client.println("<input type='submit'/></br>");
