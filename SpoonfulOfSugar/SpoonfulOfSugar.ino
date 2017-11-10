@@ -55,11 +55,19 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
 
+//------------------------------------------- ADRESSABLE LED STUFF -----------------------------------------------------------
+
+#include <Adafruit_NeoPixel.h>
+#define PIN            2
+#define NUMPIXELS      8 //number of lights
+#define BRIGHTNESS 10
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
 
 
 // ------------------------------------------ WEB RELATED FUNCTIONS ------------------------------------------------------------
-#define ssid "NDakota"
-#define password "stheffany"
+#define ssid ""
+#define password ""
 WiFiServer server(80);
 strDateTime dateTime;
 NTPtime NTPch("br.pool.ntp.org");
@@ -99,9 +107,9 @@ void startServer(void)
 
 
 void ScreenTime(){
-  display.setTextSize(1);
+  display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(0,0);
+  display.setCursor(20,30);
   display.print(hour());
   display.print(":");
   display.print(minute());
@@ -208,6 +216,21 @@ int Medicine::GetAlarmsMinute(int j){
 }
 
 void Medicine::GetAllInfo(){
+
+  // PRA TELA
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,10);
+  display.println("TOMAR REMEDIO");
+  display.println(_nameMedicine);
+  display.println("QUANTIDADE: ");
+  display.print(_amount);
+  display.display();
+  Blink(D6);
+  delay(10000);
+  display.clearDisplay(); 
+
+  //PRO SERIAL
   Serial.println("Informacoes sobre Remedio");
   Serial.println(_spot);
   Serial.println(_nameMedicine);
@@ -285,11 +308,21 @@ void IsThereAlarm(){
 
       if(medicine[i]->GetAlarmsHour(j) == hour()){
         if(medicine[i]->GetAlarmsMinute(j) == minute()){
-          Serial.println("*************** DEU CERTO *************");
-          Blink(D6);
+          Serial.println("*************** DEU CERTO *************");          
           Serial.println(medicine[i]->GetSpot());
           digitalClockDisplay();          
           medicine[i]->GetAllInfo();
+        }
+        else{
+          pixels.setPixelColor(0, pixels.Color(0,0,0));
+          pixels.setPixelColor(1, pixels.Color(0,0,0));
+          pixels.setPixelColor(2, pixels.Color(0,0,0));
+          pixels.setPixelColor(3, pixels.Color(0,0,0));
+          pixels.setPixelColor(4, pixels.Color(0,0,0));
+          pixels.setPixelColor(5, pixels.Color(0,0,0));
+          pixels.setPixelColor(6, pixels.Color(0,0,0));
+          pixels.setPixelColor(7, pixels.Color(0,0,0));
+          pixels.show();
         }
       }             
     } 
@@ -301,10 +334,16 @@ void IsThereAlarm(){
 
 void Blink(int led)
 {
-  digitalWrite(led, HIGH);
-  delay(1000);
-  Serial.println("Blink");
-  digitalWrite(led, LOW);
+  
+  pixels.setPixelColor(0, pixels.Color(255,0,255));
+  pixels.setPixelColor(1, pixels.Color(255,0,255));
+  pixels.setPixelColor(2, pixels.Color(255,0,255));
+  pixels.setPixelColor(3, pixels.Color(0,0,255));
+  pixels.setPixelColor(4, pixels.Color(0,0,255));
+  pixels.setPixelColor(5, pixels.Color(0,0,255));
+  pixels.setPixelColor(6, pixels.Color(0,0,255));
+  pixels.setPixelColor(7, pixels.Color(0,0,255));
+  pixels.show();
 }
 
 
@@ -341,10 +380,10 @@ void Test(){
         comprimido2[0]=new AlarmSchedule(); 
         comprimido2[1]=new AlarmSchedule(); 
  
-        comprimido2[0]->alarmHour =14;
-        comprimido2[0]->alarmMinute = 25;
-        comprimido2[1]->alarmHour =14;
-        comprimido2[1]->alarmMinute = 27;
+        comprimido2[0]->alarmHour =23;
+        comprimido2[0]->alarmMinute = 10;
+        comprimido2[1]->alarmHour =23;
+        comprimido2[1]->alarmMinute = 12;
 
       
       for(i=0;i<2;i++){               
@@ -357,10 +396,10 @@ void Test(){
         comprimido3[0]=new AlarmSchedule(); 
         comprimido3[1]=new AlarmSchedule();
         
-        comprimido3[0]->alarmHour =14;
-        comprimido3[0]->alarmMinute = 29; 
-        comprimido3[1]->alarmHour = 14;
-        comprimido3[1]->alarmMinute = 31; 
+        comprimido3[0]->alarmHour =23;
+        comprimido3[0]->alarmMinute = 14;
+        comprimido3[1]->alarmHour = 23;
+        comprimido3[1]->alarmMinute = 17; 
  
 
       for(i=0;i<2;i++){               
@@ -389,10 +428,16 @@ void setup() {
   startServer();
   MedicineInitialize();
 
+  pixels.setBrightness(BRIGHTNESS);
+  pixels.begin();
+  pixels.show();
+
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); 
   display.display();
-  delay(2000);
+  delay(500);
   display.clearDisplay();
+
+  
 }
 
 
