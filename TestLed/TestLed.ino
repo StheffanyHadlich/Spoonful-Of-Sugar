@@ -10,8 +10,6 @@ int LED;
 void setup(){
   Serial.begin(9600);
   pixels.setBrightness(BRIGHTNESS);
-  pixels.setPixelColor(0, pixels.Color(0,0,0));
-  pixels.setPixelColor(0, pixels.Color(0,0,0));
   pixels.begin();
   pixels.show();
   
@@ -23,21 +21,15 @@ pixels.setPixelColor(0, pixels.Color(0,0,255));
 pixels.setPixelColor(1, pixels.Color(0,0,255));
 pixels.setPixelColor(2, pixels.Color(0,0,255));
 pixels.setPixelColor(3, pixels.Color(0,0,255));
-pixels.setPixelColor(4, pixels.Color(0,0,255));
-pixels.setPixelColor(5, pixels.Color(0,0,255));
-pixels.setPixelColor(6, pixels.Color(0,0,255));
-pixels.setPixelColor(7, pixels.Color(0,0,255));
+
 pixels.show();
 delay(500);
 pixels.setPixelColor(0, pixels.Color(255,0,0));
 pixels.setPixelColor(1, pixels.Color(255,0,0));
 pixels.setPixelColor(2, pixels.Color(255,0,0));
 pixels.setPixelColor(3, pixels.Color(255,0,0));
-pixels.setPixelColor(4, pixels.Color(255,0,0));
-pixels.setPixelColor(5, pixels.Color(255,0,0));
-pixels.setPixelColor(6, pixels.Color(255,0,0));
-pixels.setPixelColor(7, pixels.Color(255,0,0));
+
 pixels.show();
-delay(1000);
+delay(500);
 
 }
