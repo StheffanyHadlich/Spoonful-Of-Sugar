@@ -177,9 +177,10 @@ class Medicine{
   public:
    bool InsertMedicine(String nameMedicine,String amount,int gap,  LinkedList<AlarmSchedule> schedule);
    int FindPlace();
-   int DefinePort(int spot);
    void AddAlarms(LinkedList<AlarmSchedule> schedule);
    void GetAllInfo();
+   void InfoDisplay();
+   void InfoSerial();
    int GetGap();
    int GetAlarmsHour(int j);
    int GetAlarmsMinute(int j);
@@ -215,22 +216,21 @@ int Medicine::GetAlarmsMinute(int j){
   return (alarms->get(j)).alarmMinute;
 }
 
-void Medicine::GetAllInfo(){
-
-  // PRA TELA
+void Medicine::InfoDisplay(){
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0,10);
+  display.setCursor(0,20);
   display.println("TOMAR REMEDIO");
   display.println(_nameMedicine);
   display.println("QUANTIDADE: ");
   display.print(_amount);
   display.display();
-  Blink(D6);
-  delay(10000);
-  display.clearDisplay(); 
+  BlinkSpot(_spot);
+  delay(5000);
+  display.clearDisplay();  
+}
 
-  //PRO SERIAL
+void Medicine::InfoSerial(){
   Serial.println("Informacoes sobre Remedio");
   Serial.println(_spot);
   Serial.println(_nameMedicine);
@@ -242,7 +242,12 @@ void Medicine::GetAllInfo(){
     Serial.print((alarms->get(i)).alarmHour);
     printDigits((alarms->get(i)).alarmMinute);
     Serial.println(); 
-  }
+  }  
+}
+
+void Medicine::GetAllInfo(){
+   InfoDisplay();
+   InfoSerial(); 
 }
 
 
@@ -252,7 +257,7 @@ bool Medicine::InsertMedicine(String nameMedicine,String amount,int gap, LinkedL
       _nameMedicine = nameMedicine;
       _amount = amount;
       _gap=gap;
-      _spot = DefinePort(place);  
+      _spot = place; //needs functions to light up the led spot  
       int i;
       
       for(i=0;i<3;i++){   
@@ -265,17 +270,6 @@ bool Medicine::InsertMedicine(String nameMedicine,String amount,int gap, LinkedL
       Serial.println("ERROR: Full box");  
       return false;
     }
-}
-
-int Medicine::DefinePort(int spot){
-  switch(spot){
-    case 0: return D0;
-    case 1: return D1;
-    case 2: return D2;
-    case 3: return D3;
-    case 4: return D4;
-    case 5: return D5;
-  }
 }
 
 int Medicine::FindPlace(){
@@ -308,21 +302,14 @@ void IsThereAlarm(){
 
       if(medicine[i]->GetAlarmsHour(j) == hour()){
         if(medicine[i]->GetAlarmsMinute(j) == minute()){
-          Serial.println("*************** DEU CERTO *************");          
+          Serial.println("*************"); 
+          BlinkAlarm();         
           Serial.println(medicine[i]->GetSpot());
           digitalClockDisplay();          
           medicine[i]->GetAllInfo();
         }
         else{
-          pixels.setPixelColor(0, pixels.Color(0,0,0));
-          pixels.setPixelColor(1, pixels.Color(0,0,0));
-          pixels.setPixelColor(2, pixels.Color(0,0,0));
-          pixels.setPixelColor(3, pixels.Color(0,0,0));
-          pixels.setPixelColor(4, pixels.Color(0,0,0));
-          pixels.setPixelColor(5, pixels.Color(0,0,0));
-          pixels.setPixelColor(6, pixels.Color(0,0,0));
-          pixels.setPixelColor(7, pixels.Color(0,0,0));
-          pixels.show();
+          LedsOff();
         }
       }             
     } 
@@ -330,20 +317,30 @@ void IsThereAlarm(){
 }
 
 
-// ----------------------------------- CLASS ALARMS / HOUR 
+// ----------------------------------- LEDS and BEEP FUNCTIONS
 
-void Blink(int led)
-{
+void LedsOff(){
+  pixels.setPixelColor(0, pixels.Color(0,0,0));
+          pixels.setPixelColor(1, pixels.Color(0,0,0));
+          pixels.setPixelColor(2, pixels.Color(0,0,0));
+          pixels.setPixelColor(3, pixels.Color(0,0,0));
+          pixels.setPixelColor(4, pixels.Color(0,0,0));
+          pixels.setPixelColor(5, pixels.Color(0,0,0));
+          pixels.setPixelColor(6, pixels.Color(0,0,0));
+          pixels.setPixelColor(7, pixels.Color(0,0,0));
+          pixels.show();  
+}
+
+void BlinkSpot(int spot){
   
-  pixels.setPixelColor(0, pixels.Color(255,0,255));
-  pixels.setPixelColor(1, pixels.Color(255,0,255));
-  pixels.setPixelColor(2, pixels.Color(255,0,255));
-  pixels.setPixelColor(3, pixels.Color(0,0,255));
-  pixels.setPixelColor(4, pixels.Color(0,0,255));
-  pixels.setPixelColor(5, pixels.Color(0,0,255));
-  pixels.setPixelColor(6, pixels.Color(0,0,255));
-  pixels.setPixelColor(7, pixels.Color(0,0,255));
+  pixels.setPixelColor(spot, pixels.Color(255,0,255));
   pixels.show();
+}
+
+void BlinkAlarm(){
+  digitalWrite(D6, HIGH);
+  delay(500);
+  digitalWrite(D6, LOW);
 }
 
 
@@ -363,11 +360,12 @@ void Test(){
 
         comprimido[0]=new AlarmSchedule(); 
         comprimido[1]=new AlarmSchedule(); 
+        // REMEDIO A
 
-        comprimido[0]->alarmHour =14;
-        comprimido[0]->alarmMinute = 21;
-        comprimido[1]->alarmHour =14;
-        comprimido[1]->alarmMinute = 23;
+        comprimido[0]->alarmHour =19;
+        comprimido[0]->alarmMinute = 44;
+        comprimido[1]->alarmHour =19;
+        comprimido[1]->alarmMinute = 50;
  
 
       for(i=0;i<2;i++){               
@@ -379,11 +377,12 @@ void Test(){
 
         comprimido2[0]=new AlarmSchedule(); 
         comprimido2[1]=new AlarmSchedule(); 
+        //REMEDIO B
  
-        comprimido2[0]->alarmHour =23;
-        comprimido2[0]->alarmMinute = 10;
-        comprimido2[1]->alarmHour =23;
-        comprimido2[1]->alarmMinute = 12;
+        comprimido2[0]->alarmHour =19;
+        comprimido2[0]->alarmMinute = 46;
+        comprimido2[1]->alarmHour =19;
+        comprimido2[1]->alarmMinute = 51;
 
       
       for(i=0;i<2;i++){               
@@ -395,11 +394,12 @@ void Test(){
 
         comprimido3[0]=new AlarmSchedule(); 
         comprimido3[1]=new AlarmSchedule();
+        //REMEDIO C
         
-        comprimido3[0]->alarmHour =23;
-        comprimido3[0]->alarmMinute = 14;
-        comprimido3[1]->alarmHour = 23;
-        comprimido3[1]->alarmMinute = 17; 
+        comprimido3[0]->alarmHour =19;
+        comprimido3[0]->alarmMinute = 48;
+        comprimido3[1]->alarmHour = 19;
+        comprimido3[1]->alarmMinute = 53; 
  
 
       for(i=0;i<2;i++){               
@@ -430,6 +430,7 @@ void setup() {
 
   pixels.setBrightness(BRIGHTNESS);
   pixels.begin();
+  LedsOff();
   pixels.show();
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); 
