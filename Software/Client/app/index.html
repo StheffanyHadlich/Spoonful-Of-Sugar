@@ -1,0 +1,30 @@
+<html>
+<head>
+  <title>Spoonfull of Sugar</title>
+  <meta charset='utf-8'>
+<h1>Spoonfull of Sugar</h1>
+</head>
+<body bgcolor="#517A92">
+
+  <img src="poppins.png" alt="bg" height="300" width="300"> 
+
+  <form>
+    <br> Remedio:
+    <input id="name" type='text'  name='medicine'/></br>
+
+    <br> Quantidade:
+    <input id="amount" type='text'  name='medicine'/></br>
+
+    <br> Adicionar Alarmes:
+    <br> Quantidade de Alarmes:
+    <input id="alarmsAmount" onchange="createAlarms()" type='number' name='hour'/></br>
+
+    <div id="Alarms"> 
+    </div>
+
+    </form>
+    <button type="button" id="enviar">Enviar</button>
+    <script src="send.js"></script>
+  </body>
+
+</html>

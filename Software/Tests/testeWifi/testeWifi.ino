@@ -94,37 +94,37 @@ void InternetStuff(){
    }
  
   // Return the response
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println(""); //  do not forget this one
-  client.println("<!DOCTYPE HTML>");
- client.println("<html>");
-client.println("<head>");
-  client.println("<title>Spoonfull of Sugar</title>");
-  client.println("<meta charset='utf-8'>");
-client.println("<h1>Spoonfull of Sugar</h1>");
-client.println("</head>");
-client.println("<body>");
-  client.println("<form>");
-    client.println("<br> Remedio:");
-    client.println("<input type='text'  name='medicine'/></br>");
-
-    client.println("<br> Quantidade:");
-    client.println("<input type='text'  name='amount'/></br>");
-
-    client.println("<br> Adicionar Alarmes:");
-    client.println("<br> Hora:");
-    client.println("<input type='number' name='hour'/></br>");
-    client.println("<br> Minuto:");
-    client.println("<input type='number' name='minute'/></br>");
-
-
-    client.println("<input type='submit'/></br>");
-    client.println("<form>");
-  client.println("</body>");
-client.println("</html>");
- 
-  delay(1);
+//  client.println("HTTP/1.1 200 OK");
+//  client.println("Content-Type: text/html");
+//  client.println(""); //  do not forget this one
+//  client.println("<!DOCTYPE HTML>");
+// client.println("<html>");
+//client.println("<head>");
+//  client.println("<title>Spoonfull of Sugar</title>");
+//  client.println("<meta charset='utf-8'>");
+//client.println("<h1>Spoonfull of Sugar</h1>");
+//client.println("</head>");
+//client.println("<body>");
+//  client.println("<form>");
+//    client.println("<br> Remedio:");
+//    client.println("<input type='text'  name='medicine'/></br>");
+//
+//    client.println("<br> Quantidade:");
+//    client.println("<input type='text'  name='amount'/></br>");
+//
+//    client.println("<br> Adicionar Alarmes:");
+//    client.println("<br> Hora:");
+//    client.println("<input type='number' name='hour'/></br>");
+//    client.println("<br> Minuto:");
+//    client.println("<input type='number' name='minute'/></br>");
+//
+//
+//    client.println("<input type='submit'/></br>");
+//    client.println("<form>");
+//  client.println("</body>");
+//client.println("</html>");
+// 
+//  delay(1);
 }
  
 void loop() {
