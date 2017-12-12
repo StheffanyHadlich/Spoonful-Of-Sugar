@@ -1,0 +1,62 @@
+<h1>Cadastro de medicamento</h1>
+
+<div class="input-group">
+    <span class="input-group-addon" id="name">Nome</span>
+    <input style="width:50%" name="nome" [(ngModel)]="nome" type="text" class="form-control" placeholder="nome"
+        aria-describedby="basic-addon1">
+</div>
+
+<br>
+
+<div class="input-group">
+    <span class="input-group-addon" id="quantidade">Quantidade</span>
+    <input style="width:50%" name="quantidade" [(ngModel)]="quantidade" type="text" class="form-control" placeholder="quantidade" aria-describedby="basic-addon1">
+</div>
+
+<br>
+
+<div class="dropdown" name="dropdownIntervalos" style="Width:15%">
+  <select #selectElem (change)="setIntervalo(selectElem.value)" class="form-control">
+      <option>Selecione Intervalo</option>
+      <option *ngFor="let item of intervalos" [value]="item.value">{{item.name}}</option>
+  </select>
+</div>
+
+<br>
+
+<div class="input-group"> 
+    <span class="input-group-addon" id="gap">Hora de Início</span>
+    <input style="width:50%" name="horaInicio" [(ngModel)]="horaInicio" type="time" class="form-control" placeholder="horaInicio" aria-describedby="basic-addon1">
+</div>
+
+<br>
+
+<div class="btn-group" style="left:50%" role="group" aria-label="...">
+    <button type="button" (click)="Save()" class="btn btn-warning">Save</button>
+</div>
+
+<p *ngIf="!remedios"><em>Buscando informações...</em></p>
+
+
+<table class='table' *ngIf="remedios">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Quantidade</th>
+            <th>Intervalo</th>
+             <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of remedios">
+            <td>{{ item.Nome }}</td>
+            <td>{{ item.Quantidade }}</td>
+            <td>{{ item.Intervalo}}</td>
+             <td>
+                    <button type="button" class="btn btn-danger" (click)="Delete(subject)">
+                        <span class='glyphicon glyphicon-trash'></span>
+                    </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
