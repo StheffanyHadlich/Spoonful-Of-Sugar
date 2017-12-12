@@ -35,6 +35,8 @@
     <button type="button" (click)="Save()" class="btn btn-warning">Save</button>
 </div>
 
+<br/>
+
 <p *ngIf="!remedios"><em>Buscando informações...</em></p>
 
 
@@ -53,7 +55,7 @@
             <td>{{ item.Quantidade }}</td>
             <td>{{ item.Intervalo}}</td>
              <td>
-                    <button type="button" class="btn btn-danger" (click)="Delete(subject)">
+                    <button type="button" class="btn btn-danger" (click)="Remove(subject)">
                         <span class='glyphicon glyphicon-trash'></span>
                     </button>
             </td>

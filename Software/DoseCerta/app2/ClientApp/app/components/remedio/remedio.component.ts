@@ -42,7 +42,7 @@ export class RemedioComponent {
             alert("Todos os dados precisam ser preenchidos");
         }
          else {
-            var value = {nome:this.nome,quantidade:this.quantidade,intervalo: this.intervalo};
+            var value = {Nome:this.nome,Quantidade:this.quantidade,Intervalo: this.intervalo};
             this.http
                 .post(this.baseUrl + 'api/Remedio', value)
                 .subscribe(result => {
@@ -53,8 +53,17 @@ export class RemedioComponent {
 
     }
 
+     public Remove(remedio : any) {
+        this.http
+            .delete(this.baseUrl + 'api/Remedio/' + remedio.id)
+            .subscribe(result => {
+                if (result.status === 204) {
+                    let index = this.remedios.indexOf(remedio);
+                    this.remedios.splice(index, 1);
+                }
+            });
+    }
 
-    Delete() {}
 
     setIntervalo(gap : any) {
         this.intervalo = gap;

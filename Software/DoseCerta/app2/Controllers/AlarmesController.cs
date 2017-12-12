@@ -43,7 +43,7 @@ namespace app2.Controllers
             {
                 await DbContext.Alarmes.AddAsync(value);
                 await DbContext.SaveChangesAsync();
-                return new NoContentResult();
+                return Ok(value);
             }
             else
             {
